@@ -1,0 +1,64 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: tiktok_backend
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=sqlite+aiosqlite:////app/data/library.db
+      - STORAGE_PATH=/app/media
+      - TIKTOK_CLIENT_KEY=${TIKTOK_CLIENT_KEY}
+      - TIKTOK_CLIENT_SECRET=${TIKTOK_CLIENT_SECRET}
+      - TIKTOK_REDIRECT_URI=${TIKTOK_REDIRECT_URI:-http://localhost:8080/api/auth/tiktok/callback}
+      - TOKEN_ENCRYPTION_KEY=${TOKEN_ENCRYPTION_KEY}
+      - SESSION_SECRET_KEY=${SESSION_SECRET_KEY:-}
+      - ENVIRONMENT=production
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - MAX_CONCURRENT_DOWNLOADS=${MAX_CONCURRENT_DOWNLOADS:-3}
+    volumes:
+      # Base de datos SQLite persistente (independiente del multimedia)
+      - ./data:/app/data
+      # Almacenamiento multimedia (carpeta local o punto de montaje NAS)
+      - ./media:/app/media
+    networks:
+      - tiktok_net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/system/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: tiktok_frontend
+    restart: unless-stopped
+    ports:
+      - "${PORT:-8080}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - tiktok_net
+
+networks:
+  tiktok_net:
+    driver: bridge
+
+# ==============================================================================
+# Alternativa: Montaje directo de volumen NAS Synology (NFS o CIFS/SMB)
+# Para usarlo, descomenta la definición del volumen y cambia en backend:
+#   volumes:
+#     - ./data:/app/data
+#     - synology_media:/app/media
+# ==============================================================================
+# volumes:
+#   synology_media:
+#     driver_opts:
+#       type: "nfs"
+#       o: "addr=192.168.1.50,rw,nfsvers=4"
+#       device: ":/volume1/tiktok_media"
+

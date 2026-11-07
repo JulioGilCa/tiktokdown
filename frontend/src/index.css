@@ -1,0 +1,68 @@
+@import "tailwindcss";
+
+/* ------------------------------------------------------------------
+   Tokens de diseño (tema oscuro principal).
+   Generan utilidades como bg-panel, text-muted, bg-accent, border-line...
+   ------------------------------------------------------------------ */
+@theme {
+  --color-bg: #111318;
+  --color-panel: #1b1f27;
+  --color-surface: #252b35;
+  --color-surface-hover: #2e3542;
+  --color-line: #2a303b;
+  --color-accent: #7c5cfc;
+  --color-accent-hover: #8d71fd;
+  --color-accent-soft: rgb(124 92 252 / 0.15);
+  --color-fg: #ffffff;
+  --color-muted: #a0a7b4;
+
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+  --color-info: #38bdf8;
+
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px -12px rgb(0 0 0 / 0.5);
+  --shadow-glow: 0 0 0 1px rgb(124 92 252 / 0.4), 0 8px 30px -8px rgb(124 92 252 / 0.45);
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-bg text-fg font-sans antialiased;
+    color-scheme: dark;
+  }
+
+  ::selection {
+    background: var(--color-accent-soft);
+  }
+
+  /* Scrollbars discretas */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-surface) transparent;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+}
+

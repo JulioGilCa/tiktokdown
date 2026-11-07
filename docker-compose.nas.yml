@@ -1,0 +1,24 @@
+# ==============================================================================
+# Docker Compose Override para Synology NAS (NFS o SMB/CIFS)
+# Uso: docker compose -f docker-compose.yml -f docker-compose.nas.yml up -d
+# ==============================================================================
+services:
+  backend:
+    volumes:
+      - ./data:/app/data
+      - nas_media:/app/media
+
+volumes:
+  nas_media:
+    driver: local
+    driver_opts:
+      # --- Opción A: NFS (Recomendado en redes Linux / Synology) ---
+      type: "nfs"
+      o: "addr=192.168.1.100,rw,nolock,soft,nfsvers=4"
+      device: ":/volume1/tiktok_media"
+
+      # --- Opción B: CIFS / SMB (alternativa con credenciales de DSM) ---
+      # type: "cifs"
+      # o: "username=usuario_synology,password=clave_synology,vers=3.0,iocharset=utf8"
+      # device: "//192.168.1.100/tiktok_media"
+
